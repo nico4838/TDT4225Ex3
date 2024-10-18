@@ -67,7 +67,6 @@ class GeolifeInserter:
                         transportation_mode = parts[2].strip()  # Transportation Mode
                         # Store a tuple (start_time, end_time) as the key in the cache
                         self.labels_cache[(start_time, end_time)] = transportation_mode
-                        print(f"Loaded label: {start_time} - {end_time} -> {transportation_mode}")
 
     def find_transportation_label(self, start_date_time, end_date_time):
         # Check for an exact match in the (start_time, end_time) key
@@ -90,20 +89,18 @@ class GeolifeInserter:
                         "lon": float(lon),
                         "altitude":float(altitude),
                         "date_days": float(date_days),
-                        "date_time": f"{date_str} {time_str}"  # Combine date and time
+                        "date_time": datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
                     }
                     trackpoints.append(trackpoint)
 
                 transportation_mode = self.find_transportation_label(trackpoints[0]["date_time"], trackpoints[-1]["date_time"])
-                if transportation_mode != '':
-                    print('Transportation mode: '+ transportation_mode)
+
                 # Create and insert the Activity document
                 activity_doc = {
                     "user_id": user_id,
-                    "start_date_time": trackpoints[0]["date_time"],
-                    "end_date_time": trackpoints[-1]["date_time"],
                     "transportation_mode": transportation_mode,
-                    "trackpoints": trackpoints  # Store all trackpoints within the activity
+                    "start_date_time": datetime.strptime(trackpoints[0]["date_time"], "%Y-%m-%d %H:%M:%S"),
+                    "end_date_time": datetime.strptime(trackpoints[-1]["date_time"], "%Y-%m-%d %H:%M:%S")
                 }
 
                 self.db["Activity"].insert_one(activity_doc)

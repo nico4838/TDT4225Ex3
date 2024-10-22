@@ -62,16 +62,16 @@ class GeolifeInserter:
                 for line in file:
                     parts = line.strip().split('\t')
                     if len(parts) == 3:
-                        start_time = parts[0].strip()  # Start Time
-                        end_time = parts[1].strip()    # End Time
+                        start_time = parts[0].strip().replace('/','-')  # Start Time
+                        end_time = parts[1].strip().replace('/','-')    # End Time
                         transportation_mode = parts[2].strip()  # Transportation Mode
                         # Store a tuple (start_time, end_time) as the key in the cache
                         self.labels_cache[(start_time, end_time)] = transportation_mode
-                        print(f"Loaded label: {start_time} - {end_time} -> {transportation_mode}")
+                        #print(f"Loaded label: {start_time} - {end_time} -> {transportation_mode}")
 
     def find_transportation_label(self, start_date_time, end_date_time):
         # Check for an exact match in the (start_time, end_time) key
-        return self.labels_cache.get((start_date_time, end_date_time), '')
+        return self.labels_cache.get((start_date_time, end_date_time), None)
         
     def insert_activity(self, user_id, plt_file_path):
         # Load the labels file into memory for the new user (cache is cleared here)
@@ -94,8 +94,12 @@ class GeolifeInserter:
                     }
                     trackpoints.append(trackpoint)
 
+                # Determine the transportation mode for the activity
+                print('Start date time: '+ trackpoints[0]["date_time"])
+                print('End date time: '+ trackpoints[-1]["date_time"])
+
                 transportation_mode = self.find_transportation_label(trackpoints[0]["date_time"], trackpoints[-1]["date_time"])
-                if transportation_mode != '':
+                if transportation_mode != None:
                     print('Transportation mode: '+ transportation_mode)
                 # Create and insert the Activity document
                 activity_doc = {

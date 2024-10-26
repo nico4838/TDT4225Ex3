@@ -9,7 +9,6 @@ from bson.objectid import ObjectId
 class GeolifeInserter:
 
     def __init__(self):
-        # Connect to MongoDB
         self.connection = DbConnector()
         self.client = self.connection.client
         self.db = self.connection.db
@@ -114,7 +113,7 @@ class GeolifeInserter:
                 # Generate unique _id for each trackpoint and activity_id for reference
                 tp['_id'] = [str(ObjectId()) for _ in range(tp_size)]  # Generate unique IDs for trackpoints
                 activity_id = ObjectId()  # Generate a unique ObjectId for the activity
-                tp['activity_id'] = user_id  # Set activity_id for all trackpoints
+                tp['activity_id'] = activity_id  # Set activity_id for all trackpoints
 
                 trackpoint_ids = tp['_id'].tolist()
 
@@ -126,8 +125,8 @@ class GeolifeInserter:
                 trackpoint_ids = tp['_id'].tolist()
 
                 activity_doc = {
+                    "_id": activity_id,
                     "user_id": user_id,
-                    "activity_id": activity_id,
                     "start_date_time": first_time,
                     "end_date_time": last_time,
                     "transportation_mode": transportation_mode,

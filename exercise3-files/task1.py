@@ -59,7 +59,6 @@ class GeolifeInserter:
                         transportation_mode = parts[2].strip()  
 
                         self.labels_cache[(start_time, end_time)] = transportation_mode
-                        #print(f"Loaded label: {start_time} - {end_time} -> {transportation_mode}")
 
     def find_transportation_label(self, start_date_time, end_date_time):
         return self.labels_cache.get((start_date_time, end_date_time), None)
@@ -104,11 +103,6 @@ class GeolifeInserter:
 
                 trackpoint_ids = tp['_id'].tolist()
 
-
-
-                # tp['_id'] = user_id + '_' + tp['date_time'] 
-                # tp['activity_id'] = user_id 
-                
                 trackpoint_ids = tp['_id'].tolist()
 
                 activity_doc = {
@@ -127,40 +121,6 @@ class GeolifeInserter:
                 collection.insert_many(tf_dict)
                 print('Trackpoints inserted')
 
-            # if len(lines) <= 2500:  # Only process activities with <= 2500 trackpoints
-            #     for line in lines:
-            #         lat, lon, _, altitude, date_days, date_str, time_str = line.strip().split(',')
-                    
-            #         # Create a dictionary for each trackpoint
-            #         trackpoint = {
-            #             "lat": float(lat),
-            #             "lon": float(lon),
-            #             "altitude":float(altitude),
-            #             "date_days": float(date_days),
-            #             "date_time": f"{date_str} {time_str}"  # Combine date and time
-            #         }
-            #         trackpoints.append(trackpoint)
-
-            #     # Determine the transportation mode for the activity
-            #     print('Start date time: '+ trackpoints[0]["date_time"])
-            #     print('End date time: '+ trackpoints[-1]["date_time"])
-
-            #     transportation_mode = self.find_transportation_label(trackpoints[0]["date_time"], trackpoints[-1]["date_time"])
-            #     if transportation_mode != None:
-            #         print('Transportation mode: '+ transportation_mode)
-            #     # Create and insert the Activity document
-            #     activity_doc = {
-            #         "user_id": user_id,
-            #         "start_date_time": trackpoints[0]["date_time"],
-            #         "end_date_time": trackpoints[-1]["date_time"],
-            #         "transportation_mode": transportation_mode,
-            #         "trackpoints": trackpoints  # Store all trackpoints within the activity
-            #     }
-
-                #self.db["Activity"].insert_one(activity_doc)
-
-                # Insert trackpoints as separate documents in the TrackPoint collection
-                #self.db["TrackPoint"].insert_many(trackpoints)  # Bulk insert
 
     def fetch_documents(self, collection_name):
         collection = self.db[collection_name]
@@ -185,8 +145,7 @@ def main():
         print('Collections created')
         inserter.insert_geolife_data(dataset_path)
         print('Data inserted')
-
-        # Optionally, you can fetch and display the documents to verify insertion
+        
         #inserter.fetch_documents("User")
         #inserter.fetch_documents("Activity")
 
